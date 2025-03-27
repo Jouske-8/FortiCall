@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toggle Checkbox List</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .container {
+            text-align: center;
+            margin-top: 50px;
+            position: relative;
+            display: inline-block;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        .large-box {
+            width: 250px;
+            padding: 20px;
+            background: #007bff;
+            color: white;
+            border-radius: 8px;
+            display: inline-block;
+            text-align: left;
+            position: relative;
+        }
+        .toggle-button {
+            margin-top: 10px;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            background: #28a745;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+        .toggle-button:hover {
+            background: #218838;
+        }
+        .small-checkboxes {
+            display: none;
+            margin-top: 10px;
+        }
+        .small-checkboxes.active {
+            display: block;
+        }
+        .small-checkboxes label {
+            display: block;
+            background: #f9f9f9;
+            color: #555;
+            padding: 5px;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+        .bottom-right-button {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            background: #dc3545;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+        .bottom-right-button:hover {
+            background: #c82333;
+        }
+        .bottom-left-button {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            background: #17a2b8;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+        .bottom-left-button:hover {
+            background: #138496;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="large-box">
+            <div>
+                <tr>
+                    <tr>
+                        <span id="main-procces">Main Option</span>
+                    </tr>
+                    <tr>
+                        <input type="checkbox">
+                    </tr>
+
+                </tr>
+            </div>
+            <button class="toggle-button" onclick="toggleCheckboxes()">Expand Options</button>
+            <div class="small-checkboxes" id="checkboxContainer">
+                <!-- <label><input type="checkbox"> Option 1</label> -->
+            </div>
+        </div>
+        <button class="bottom-left-button" onclick="updateProcces(-1)">Prev</button>
+        <button class="bottom-right-button" onclick="updateProcces(1)">Next</button>
+    </div>
+    
+    <script>
+        const calls = ["Process Management", "File System Operations", "Memory Management", "Inter-Process Communication (IPC)", "Thread Management & Synchronization", "Signals & Event Handling", "Time Management", "Network Operations", "Security & Privilege Management", "Debugging & Tracing", "Device & Driver Interaction", "Virtualization & Namespaces", "Miscellaneous"];
+        const extraCalls = [[
+                            "fork", "vfork", "clone",
+                            "execve", "execveat",
+                            "exit", "_exit",
+                            "wait4", "waitid"
+                            ], [
+                            "open", "openat", "close",
+                            "read", "write", "pread64", "pwrite64",
+                            "stat", "fstat", "lstat", "newfstatat",
+                            "lseek", "truncate", "ftruncate",
+                            "rename", "renameat", "unlink", "unlinkat",
+                            "mkdir", "rmdir", "symlink", "link",
+                            "mount", "umount2"
+                            ], [
+                            "mmap", "munmap",
+                            "mprotect", "madvise",
+                            "brk",
+                            "shmget", "shmat", "shmdt", "shmctl"
+                            ], [
+                            "pipe", "pipe2",
+                            "socket", "connect", "bind",
+                            "sendto", "recvfrom",
+                            "shmget", "msgget", "semget",
+                            "ioctl", "fcntl"
+                            ], [
+                            "futex",
+                            "sched_yield",
+                            "setpriority", "getpriority",
+                            "setrlimit", "getrlimit"
+                            ], [
+                            "kill", "tkill", "tgkill",
+                            "sigaction", "sigprocmask", "sigpending",
+                            "signalfd", "eventfd"
+                            ], [
+                            "gettimeofday", "clock_gettime",
+                            "nanosleep",
+                            "timer_create", "timer_settime"
+                            ], [
+                            "socket", "bind", "listen", "accept",
+                            "send", "recv", "sendmsg", "recvmsg",
+                            "getsockopt", "setsockopt",
+                            "shutdown"
+                            ], [
+                            "setuid", "setgid", "seteuid", "setegid",
+                            "capget", "capset",
+                            "seccomp",
+                            "chroot"
+                            ], [
+                            "ioctl",
+                            "mknod", "mknodat",
+                            "inotify_add_watch", "inotify_rm_watch"
+                            ], [
+                            "setns",
+                            "unshare",
+                            "clone"
+                            ], [
+                            "getrandom",
+                            "syslog",
+                            "reboot",
+                            "_sysctl"
+                            ]];
+        var iter = 0;
+        document.getElementById("main-procces").innerHTML = calls[iter];
+        const checkboxContainer = document.getElementById("checkboxContainer");
+        function updateSysCalls(){
+            document.getElementById("checkboxContainer").innerHTML = "";
+            // Loop through the array and create checkboxes
+            extraCalls[iter].forEach(option => {
+                // Create a new label element
+                const label = document.createElement("label");
+
+                // Create a new input checkbox
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";  // Set the type to checkbox
+
+                // Add the option text to the label
+                label.textContent = ` ${option}`;
+
+                // Append the checkbox to the label
+                label.insertBefore(checkbox, label.firstChild);
+
+                // Append the label to the checkbox container
+                checkboxContainer.appendChild(label);
+                // checkboxContainer.appendChild(document.createElement("br")); // Adding a line break after each checkbox
+            });
+        }
+        updateSysCalls();
+        function updateProcces(up){
+            if(iter+up >= 0 && iter+up < calls.length){
+                iter += up;
+                document.getElementById("main-procces").innerHTML = calls[iter];
+                updateSysCalls();
+            }
+            
+        }
+
+        function toggleCheckboxes() {
+            const checkboxes = document.getElementById("checkboxContainer");
+            checkboxes.classList.toggle("active");
+        }
+    </script>
+</body>
+</html>
